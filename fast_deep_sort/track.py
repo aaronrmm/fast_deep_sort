@@ -1,17 +1,25 @@
 class Detection:
     def __init__(self, frame_idx, detection_box, features):
-        self.frame = frame_idx
+        self.frame_idx = frame_idx
         self.detection_box = detection_box
         self.features = features
+        self.last_detection = None
 
         
 class Track:
     def __init__(self, first_detection):
-        self.detections = []
-        self.detections.append(first_detection)
+        self.detections = {}
+        self.add_detection(first_detection)
+        
+    def add_detection(self, detection):
+        self.detections[detection.frame_idx] = detection
+        self.last_detection = detection
         
     def is_expired(self, current_frame, expiration_threshold):
-        return (current_frame - self.detections[-1].frame) > expiration_threshold
+        return (current_frame - self.get_last_detection().frame_idx) > expiration_threshold
+        
+    def get_last_detection(self):
+        return self.last_detection
         
         
 class TrackManager:
@@ -38,7 +46,7 @@ class TrackManager:
             # track matching algorithm - currently random #TODO use actual algorithm
             if len(unassigned_tracks)>0:
                 track = unassigned_tracks.pop()
-                track.detections.append(detection)
+                track.add_detection(detection)
                 
             # if no match found, make new Track
             if track is None:

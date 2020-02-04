@@ -2,14 +2,31 @@ class Detection:
     def __init__(self, frame_idx, detection_box, features):
         self.frame_idx = frame_idx
         self.detection_box = detection_box
-        self.features = features
-        self.last_detection = None
+        
+    def left(self, image_width):
+        return image_width * self.detection_box[1].numpy().item()
+        
+    def right(self, image_width):
+        return image_width * self.detection_box[3].numpy().item()
+        
+    def top(self, image_height):
+        return image_height * self.detection_box[0].numpy().item()
+        
+    def bottom(self, image_height):
+        return image_height * self.detection_box[2].numpy().item()
+        
+    def width(self, image_width):
+        return self.right(image_width) - self.left(image_width)
+        
+    def height(self, image_height):
+        return self.bottom(image_height) - self.top(image_height)
 
         
 class Track:
     def __init__(self, first_detection):
         self.detections = {}
         self.add_detection(first_detection)
+        self.last_detection = first_detection
         
     def add_detection(self, detection):
         self.detections[detection.frame_idx] = detection

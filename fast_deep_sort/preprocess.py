@@ -5,6 +5,14 @@ import numpy as np
 import tensorflow as tf
 
 
+def frame_batch_iterator(frames_dir, image_extensions=['jpg'], batch_size=4):
+    batch_iterator = (
+        load_frames(frames_dir, image_extensions)
+        .batch(batch_size)
+        .make_one_shot_iterator()
+    )
+    return batch_iterator
+
 def load_frames(frames_dir, image_extensions):
     image_files = [filename for filename in os.listdir(frames_dir) if filename.split('.')[-1] in image_extensions]
     np_images = [np.array(Image.open(frames_dir/filename), dtype=np.uint8) for filename in image_files]

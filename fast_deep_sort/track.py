@@ -4,16 +4,16 @@ class Detection:
         self.detection_box = detection_box
         
     def left(self, image_width):
-        return image_width * self.detection_box[1].numpy().item()
+        return image_width * self.detection_box[1].item()
         
     def right(self, image_width):
-        return image_width * self.detection_box[3].numpy().item()
+        return image_width * self.detection_box[3].item()
         
     def top(self, image_height):
-        return image_height * self.detection_box[0].numpy().item()
+        return image_height * self.detection_box[0].item()
         
     def bottom(self, image_height):
-        return image_height * self.detection_box[2].numpy().item()
+        return image_height * self.detection_box[2].item()
         
     def width(self, image_width):
         return self.right(image_width) - self.left(image_width)
@@ -51,23 +51,20 @@ class TrackManager:
         self.all_tracks.append(track)
         return track
         
-    def update_tracks(self,frame_idx, detections):
+    def update_tracks(self,frame_idx, detections, matchmaker):
         found_tracks = []
         unassigned_tracks = self.active_tracks
         occluded_tracks = []
         detections = [Detection(frame_idx, detection_box, None) for detection_box in detections]
-        
+        matches: dict = matchmaker.match(detections, self.all_tracks)
         for detection in detections:
             track:Track = None
                 
-            # track matching algorithm - currently random #TODO use actual algorithm
-            if len(unassigned_tracks)>0:
-                track = unassigned_tracks.pop()
-                track.add_detection(detection)
-                
             # if no match found, make new Track
-            if track is None:
+            if not detection in matches.keys():
                 track = self.new_track(detection)
+            else:
+                track = matches[detection]
                 
             found_tracks.append(track)
             

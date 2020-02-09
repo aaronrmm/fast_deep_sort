@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 from tensorflow import keras
 from importlib import import_module
-from fast_deep_sort.preprocess import frame_batch_iterator
+from fast_deep_sort.preprocess import image_dir_batch_iterator
 from fast_deep_sort.detection import load_detector
 from fast_deep_sort.track import TrackManager
 
@@ -16,7 +16,7 @@ DETECTION_THRESHOLD = 0.5
 EXPIRATION_THRESHOLD=10
 
 def generate_tracks(matchmaker):
-    batch_iterator = frame_batch_iterator(FRAMES_DIR, IMAGE_FORMATS, BATCH_SIZE)
+    batch_iterator = image_dir_batch_iterator(FRAMES_DIR, IMAGE_FORMATS, BATCH_SIZE)
     detector = load_detector(DETECTOR_NAME)
     tracker = TrackManager(expiration_threshold = EXPIRATION_THRESHOLD)
 

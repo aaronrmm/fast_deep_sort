@@ -3,6 +3,7 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 import tensorflow as tf
+import cv2
 
 
 def image_dir_batch_iterator(frames_dir, image_extensions=['jpg'], batch_size=4):

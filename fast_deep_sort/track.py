@@ -1,5 +1,5 @@
 class Detection:
-    def __init__(self, frame_idx, detection_box, features):
+    def __init__(self, frame_idx, detection_box, features=None):
         self.frame_idx = frame_idx
         self.detection_box = detection_box
         
@@ -20,8 +20,13 @@ class Detection:
         
     def height(self, image_height):
         return self.bottom(image_height) - self.top(image_height)
-
         
+    def mask(height, width):
+        mask = np.zeros((height, width, 3))
+        mask[bottom(height):top(height),left(width):right(width)]=1
+        return mask
+
+
 class Track:
     def __init__(self, first_detection):
         self.detections = {}

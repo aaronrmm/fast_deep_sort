@@ -22,6 +22,7 @@ FEATURE_EXTRACTOR_PATH = './triplet_reid/encoder_trinet.pb'
 INPUT_HEIGHT = 256
 INPUT_WIDTH = 128
 SIZE_ACTIVE_TRACK_BUFFER = 32
+DEVICE = '/gpu:0'
 
 def generate_tracks():
 
@@ -33,7 +34,7 @@ def generate_tracks():
     with tf.Session(graph=tf.Graph(), config=config) as sess:
     
         batch_iterator = image_dir_batch_iterator(FRAMES_DIR, IMAGE_FORMATS, BATCH_SIZE)
-        with tf.device('/cpu:0'):
+        with tf.device(DEVICE):
             detector = load_detector(DETECTOR_NAME)
         tracker = TrackManager(max_tracks = SIZE_ACTIVE_TRACK_BUFFER, feature_dim = EMBEDDING_DIM, infinite_distance = INFINITE_DISTANCE)
         
@@ -43,8 +44,6 @@ def generate_tracks():
             output_graph_def.ParseFromString(f.read())
             tf.import_graph_def(output_graph_def, name='')
         print('{} ops in the frozen graph.'.format(len(output_graph_def.node)))
-        in_img = sess.graph.get_tensor_by_name('input:0')
-        emb = sess.graph.get_tensor_by_name('head/out_emb:0')
         
         print("%d frames processed..."%(frames_processed))
         while(True):
@@ -67,7 +66,7 @@ def generate_tracks():
                 class_batch = class_batch[:,:max_detections]
                 bbox_batch = bbox_batch[:,:max_detections,:]
 
-                distance, detection_features, tracks = tracker.update_tracks(sess, frame_batch, bbox_batch, class_batch, distance_metric, in_img, emb)
+                distance, detection_features, tracks = tracker.update_tracks(sess, frame_batch, bbox_batch, class_batch, distance_metric)
                 frames_processed+=batch_size
                 print("%d frames processed..."%(frames_processed))
             except tf.errors.OutOfRangeError:

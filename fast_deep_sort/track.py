@@ -73,7 +73,7 @@ class TrackManager:
         self.active_tracks.append(track)
         self.active_track_features[empty_buffer_idx] = features
     
-    def update_tracks(self, sess, frame_batch, bbox_batch, class_batch, distance_metric, in_img, emb, infinite_distance= 1000):
+    def update_tracks(self, sess, frame_batch, bbox_batch, class_batch, distance_metric, infinite_distance= 1000):
         INPUT_HEIGHT = 256
         INPUT_WIDTH = 128
         in_img = sess.graph.get_tensor_by_name('input:0')
@@ -90,6 +90,7 @@ class TrackManager:
                 new_detection_features, # num_detections x embedding size
                 self.active_track_features # num_tracks x embedding size
             )
+            
             # find best detection for each active track
             for active_track in self.active_tracks:
                 best_detection_index = np.argmin(distance[:, active_track.buffer_idx])
